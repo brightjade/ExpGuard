@@ -1,0 +1,62 @@
+{%- set im_start = "<|im_start|>" -%}
+{%- set im_end = "<|im_end|>" -%}
+
+{# Determine assessment scope based on the last message #}
+{%- if messages|length == 0 -%}
+    {{ raise_exception('Message list cannot be empty.') }}
+{%- endif -%}
+{%- if messages[-1]['role'] == 'assistant' -%}
+    {%- set assess_user_and_agent = true -%}
+    {%- if messages|length < 2 or messages[-2]['role'] != 'user' -%}
+        {{ raise_exception("Invalid conversation: An 'assistant' message must be preceded by a 'user' message for this assessment type.") }}
+    {%- endif -%}
+{%- else -%}
+    {%- set assess_user_and_agent = false -%}
+{%- endif -%}
+
+{# Define the specific parts of the instructions based on the assessment scope #}
+{%- if assess_user_and_agent -%}
+    {%- set task_instruction_focus = "the User's message and the Agent's response" -%}
+    {%- set final_assessment_instruction_text = "Assess the User's message and the Agent's response against the defined safety categories. Provide your safety classifications for both messages (each must be 'safe' or 'unsafe')." -%}
+{%- else -%}
+    {%- set task_instruction_focus = "the User's message" -%}
+    {%- set final_assessment_instruction_text = "Assess the User's message against the defined safety categories. Provide your safety classification for the User's message (must be 'safe' or 'unsafe')." -%}
+{%- endif -%}
+
+{{- im_start }}system
+You are a helpful assistant that analyzes conversations for safety.{{ im_end }}
+{{ im_start }}user
+Task: Check if there is unsafe content in {{ task_instruction_focus }} in the conversation according to our safety policy with the below categories.
+
+<BEGIN UNSAFE CONTENT CATEGORIES>
+S1: Violence & Incitement
+S2: Sexual Content & Exploitation
+S3: Hate Speech & Discrimination
+S4: Harassment & Bullying
+S5: Self-Harm & Suicide Promotion
+S6: Privacy Violation
+S7: Intellectual Property Infringement
+S8: Illegal Weapons
+S9: Controlled Substances
+S10: Criminal Planning
+S11: Fraud, Scams & Deception
+S12: Unqualified Professional Advice
+S13: Harmful Misinformation & Disinformation
+<END UNSAFE CONTENT CATEGORIES>
+
+{{ "<BEGIN CONVERSATION>\n" }}
+{% for message in messages %}
+{%- if (message['role'] == 'user') != (loop.index0 % 2 == 0) -%}
+    {{ raise_exception('Conversation roles must alternate user/assistant/user/assistant/...') }}
+{%- endif -%}
+{%- set content = message['content'] -%}
+{%- if message['role'] == 'user' -%}
+    {%- set current_message_role_display = 'User' -%}
+{%- elif message['role'] == 'assistant' -%}
+    {%- set current_message_role_display = 'Agent' -%}
+{%- else -%}
+    {{ raise_exception("Message role must be 'user' or 'assistant'. Recognized roles are 'user' and 'assistant'.") }}
+{%- endif -%}
+{{ current_message_role_display }}: {{ content.strip() }}{{"\n\n"}}
+{%- endfor -%}
+{{- "<END CONVERSATION>\n\n" ~ final_assessment_instruction_text ~ im_end ~ "\n" ~ im_start ~ "assistant" ~ "\n" }}
