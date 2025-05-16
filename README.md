@@ -2,6 +2,8 @@
 
 This repository is the official implementation of *ExpGuard: LLM Content Moderation in Specialized Domains*.
 
+**Important Notice for Reviewers:** During the reviewing period, both the code and dataset are kept private due to the sensitive nature of the content. Upon acceptance, we plan to release them with gated access to ensure responsible usage, given the potentially harmful nature of the training and evaluation data. This approach aligns with ethical AI development practices and helps prevent misuse of the content. (The code repository itself is not harmful and will be made public without gated access, but the model weights below need a careful consideration.)
+
 ## Requirements
 
 To install requirements:
@@ -12,6 +14,17 @@ pip install -r requirements.txt
 ```
 
 It is recommended to set up the environment where CUDA version is 12+ for enabling flash attention. Otherwise, exclude installing flash attention.
+
+## Hardware Requirements
+
+### Training
+- **Recommended Setup (Used in Paper)**: 4 × NVIDIA H200 144GB GPUs
+- **Minimum Requirements (tested)**: 2 × NVIDIA H200 144GB GPUs
+- The training process requires significant GPU memory due to the large model size and long sequence length (4096).
+
+### Evaluation
+- A single NVIDIA A6000 or A100 GPU is sufficient for evaluation
+- Evaluation can be run on smaller GPUs with appropriate batch size adjustments
 
 ## Data
 
@@ -47,7 +60,7 @@ To train the model in the paper:
     - `gradient_accumulation_steps`: Gradient accumulation steps (default: `2`).
     - `max_seq_len`: Maximum sequence length (default: `4096`).
     - `learning_rate`: Learning rate (default: `5e-6`).
-    - `epochs`: Number of training epochs (default: `2`).
+    - `epochs`: Number of training epochs (default: `3`).
     - `attn_implementation`: Attention implementation (default: `flash_attention_2`). Set to `sdpa` or `eager` if flash attention is not available.
 2. Run the training script:
 
@@ -81,5 +94,7 @@ The following is the reported scores of ExpGuard:
 | Model | Public Prompt Harm Avg. F1 | Public Response Harm Avg. F1 | ExpGuardTest Prompt Harm Total F1 | ExpGuardTest Response Harm Total F1 |
 |---|---|---|---|---|
 | ExpGuard | 85.7 | 78.5 | 93.3 | 92.7 |
+
+To reproduce the scores in the paper, we use **early stopping** at the end of epoch 2. Please refer to Appendix for more hyperparameter details.
 
 **Note:** The reported values may not be perfectly reproducible and might vary slightly due to factors such as the vLLM inference library, CUDA versions, specific GPU devices used, and other stochastic elements in the evaluation process.

@@ -79,7 +79,7 @@ if __name__ == "__main__":
     parser.add_argument("--warmup_ratio", type=float, default=0.03)
     parser.add_argument("--weight_decay", type=float, default=0.0)
     parser.add_argument("--max_grad_norm", type=float, default=1.0)
-    parser.add_argument("--epochs", type=int, default=2)
+    parser.add_argument("--epochs", type=int, default=3)
     parser.add_argument("--logging_steps", type=float, default=0.1)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--use_4bit_quantization", action="store_true")

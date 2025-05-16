@@ -10,9 +10,9 @@ accelerate launch --num_processes 4 --main_process_port 29600 train.py \
     --max_seq_len 4096 \
     --learning_rate 5e-6 \
     --warmup_ratio 0.03 \
-    --weight_decay 0.01 \
+    --weight_decay 0.0 \
     --epochs 3 \
-    --seed 20250515 \
+    --seed 42 \
     --wandb_mode online \
     --attn_implementation flash_attention_2 \
     --do_train \
