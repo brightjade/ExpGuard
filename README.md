@@ -2,8 +2,6 @@
 
 This repository is the official implementation of *ExpGuard: LLM Content Moderation in Specialized Domains*.
 
-**Important Notice for Reviewers:** During the reviewing period, both the code and dataset are kept private due to the sensitive nature of the content. Upon acceptance, we plan to release them with gated access to ensure responsible usage, given the potentially harmful nature of the training and evaluation data. This approach aligns with ethical AI development practices and helps prevent misuse of the content. (The code repository itself is not harmful and will be made public without gated access, but the model weights below need a careful consideration.)
-
 ## Requirements
 
 To install requirements:
@@ -28,8 +26,7 @@ It is recommended to set up the environment where CUDA version is 12+ for enabli
 
 ## Data
 
-Download our ExpGuardMix (`train.jsonl`, `val.jsonl`, `test.jsonl`) and put them in the `data/expguardmix` folder.
-- [Kaggle Private Data Download Link](https://kaggle.com/datasets/99644af2eb4febcdb6f20f8b2bec5a16279eb205ce6565fe3f5c831bc9c47d49)
+Get our ExpGuardMix (`train.jsonl`, `val.jsonl`, `test.jsonl`) in supplementary materials and put them in the `data/expguardmix` folder.
 
 Then, the project structure will be as follows:
 ```
@@ -81,11 +78,6 @@ To evaluate model safety:
 bash scripts/safety_eval.sh
 ```
 6. The results will be saved in the `./classfication_results` directory.
-
-## Model Weights
-
-You can download ExpGuard's model weights here:
-- [Google Drive Model Weights Download Link](https://drive.google.com/file/d/1oKI67clgR96s8YOPzonmTjNSjZsf1yXO/view?usp=sharing)
 
 ## Results
 

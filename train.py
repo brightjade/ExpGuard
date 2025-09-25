@@ -32,7 +32,7 @@ def main(args):
             bf16=args.bf16,
             gradient_checkpointing=args.use_gradient_checkpointing,
             gradient_checkpointing_kwargs={"use_reentrant": False},
-            optim="paged_adamw_32bit",
+            optim="adamw_torch",
             learning_rate=args.learning_rate,
             warmup_ratio=args.warmup_ratio,
             weight_decay=args.weight_decay,
