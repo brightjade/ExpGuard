@@ -1,8 +1,7 @@
 import abc
-import os
-import json
 from collections import defaultdict
 
+from datasets import load_dataset
 from evaluation.schemas import ClassificationTaskBase
 from evaluation.tasks.metrics import get_average, get_f1
 from src.classifier_models.base import SafetyClassifierBase, PromptHarmfulness, ResponseHarmfulness, ResponseRefusal
@@ -60,14 +59,16 @@ class ExpertGuardPromptSafetyEvalBase(ClassificationTaskBase, abc.ABC):
 
 class ExpertGuardPromptSafetyEval(ExpertGuardPromptSafetyEvalBase):
     def load(self) -> list[dict]:
-        current_path = os.path.dirname(os.path.abspath(__file__))
-        datapath = os.path.join(current_path, "test.jsonl")
+        dataset = load_dataset("6rightjade/expguardmix", "expguardtest", split="test")
         input = []
-        with open(datapath, 'r', encoding='utf-8') as f:
-            for line in f:
-                data = json.loads(line)
-                input.append({"prompt": data['prompt'], "response": "", "prompt_harmfulness": PromptHarmfulness.HARMFUL if data['prompt_label'] == 'unsafe' else PromptHarmfulness.UNHARMFUL,
-                              "domain": data['domain'], "prompt_category": data['prompt_category']})
+        for data in dataset:
+            input.append({
+                "prompt": data['prompt'],
+                "response": "",
+                "prompt_harmfulness": PromptHarmfulness.HARMFUL if data['prompt_label'] == 'unsafe' else PromptHarmfulness.UNHARMFUL,
+                "domain": data['domain'],
+                "prompt_category": data['prompt_category'],
+            })
         return input
 
 
@@ -130,13 +131,14 @@ class ExpertGuardResponseSafetyEvalBase(ClassificationTaskBase, abc.ABC):
 
 class ExpertGuardResponseSafetyEval(ExpertGuardResponseSafetyEvalBase):
     def load(self) -> list[dict]:
-        current_path = os.path.dirname(os.path.abspath(__file__))
-        datapath = os.path.join(current_path, "test.jsonl")
+        dataset = load_dataset("6rightjade/expguardmix", "expguardtest", split="test")
         input = []
-        with open(datapath, 'r', encoding='utf-8') as f:
-            for line in f:
-                data = json.loads(line)
-                if data['response']:
-                    input.append({"prompt": data['prompt'], "response": data['response'], "response_harmfulness": ResponseHarmfulness.HARMFUL if data['response_label'] == 'unsafe' else ResponseHarmfulness.UNHARMFUL,
-                                  "domain": data['domain']})
+        for data in dataset:
+            if data['response']:
+                input.append({
+                    "prompt": data['prompt'],
+                    "response": data['response'],
+                    "response_harmfulness": ResponseHarmfulness.HARMFUL if data['response_label'] == 'unsafe' else ResponseHarmfulness.UNHARMFUL,
+                    "domain": data['domain'],
+                })
         return input

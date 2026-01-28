@@ -1,17 +1,22 @@
 import os.path as osp
 import json
 import torch
-from datasets import Dataset
+from datasets import Dataset, load_dataset
 
 
 def load_data(args, tokenizer):
-    with open(osp.join(args.data_dir, "train.jsonl"), "r", encoding="utf-8") as f:
-        train_data = [json.loads(line) for line in f]
-    with open(osp.join(args.data_dir, "val.jsonl"), "r", encoding="utf-8") as f:
-        eval_data = [json.loads(line) for line in f]
-
-    # concat train and eval after hyperparameter tuning to maximize performance
-    data = train_data + eval_data
+    expguardmix = load_dataset("6rightjade/expguardmix", "expguardtrain", split="train")
+    
+    with open(osp.join(args.data_dir, "lmsys.jsonl"), "r", encoding="utf-8") as f:
+        lmsys_data = [json.loads(line) for line in f]
+    with open(osp.join(args.data_dir, "wildchat.jsonl"), "r", encoding="utf-8") as f:
+        wildchat_data = [json.loads(line) for line in f]
+    with open(osp.join(args.data_dir, "suicide.jsonl"), "r", encoding="utf-8") as f:
+        suicide_data = [json.loads(line) for line in f]
+    
+    # concat all datasets (convert HF dataset to list of dicts)
+    data = lmsys_data + wildchat_data + suicide_data + expguardmix.to_list()
+    
     # convert all none to empty string to convert to huggingface dataset
     data = [{k: v if v is not None else "" for k, v in d.items()} for d in data]
     dataset = Dataset.from_list(data)
