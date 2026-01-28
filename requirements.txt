@@ -33,7 +33,6 @@ fastchat==0.1.0
 fastrlock==0.8.3
 filelock==3.18.0
 fire==0.7.0
-flash_attn==2.7.4.post1
 frozenlist==1.6.0
 fsspec==2025.3.0
 gguf==0.16.3
