@@ -71,15 +71,17 @@ class ExpGuardBase(SafetyClassifierBase, ABC):
 
 
 class ExpGuard(ExpGuardBase):
-    def __init__(self, batch_size: int = -1, ephemeral_model: bool = False, **kwargs):
+    DEFAULT_MODEL_ID = "6rightjade/expguard-7b"
+
+    def __init__(self, batch_size: int = -1, ephemeral_model: bool = False, model_id: str = None, **kwargs):
         super().__init__(batch_size, **kwargs)
-        self.model_path = kwargs.get("local_model_path")
+        self.model_id = model_id or self.DEFAULT_MODEL_ID
         self.lora_path = None
         if ephemeral_model:
             self.model = None
         else:
-            self.model = LLM(model=self.model_path, enable_lora=self.lora_path is not None)
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_path)
+            self.model = LLM(model=self.model_id, enable_lora=self.lora_path is not None)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_id)
 
     @torch.inference_mode()
     def _classify_batch(self, batch: list[dict[str, str]]) -> list[SafetyClassifierOutput]:
@@ -87,7 +89,7 @@ class ExpGuard(ExpGuardBase):
         if self.model is None:
             decoded_outputs = subprocess_inference_with_vllm(
                 prompts=formatted_prompts,
-                model_name_or_path=self.model_path,
+                model_name_or_path=self.model_id,
                 max_tokens=128,
                 temperature=0.0,
                 top_p=1.0,
@@ -98,7 +100,7 @@ class ExpGuard(ExpGuardBase):
             decoded_outputs = inference_with_vllm(
                 prompts=formatted_prompts,
                 model=self.model,
-                model_name_or_path=self.model_path,
+                model_name_or_path=self.model_id,
                 max_tokens=128,
                 temperature=0.0,
                 top_p=1.0,

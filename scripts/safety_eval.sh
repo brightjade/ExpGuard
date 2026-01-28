@@ -11,7 +11,6 @@ current_time=$(date +"%Y-%m-%d_%H-%M-%S")
 
 model_name="ExpGuard"
 task_type="prompt" # 'prompt' or 'response'
-model_path=""      # replace with the path to the model to evaluate
 
 # Define task lists based on type
 prompt_tasks=("expguardtest" "toxicchat" "openai_mod" "xstest_prompt_harm" "harmbench" "aegis_safety_dataset2" "wildguardtest_prompt")
@@ -43,5 +42,4 @@ python safety-eval/evaluation/eval.py classifiers \
   --model_name $model_name \
   --tasks $tasks \
   --report_output_path "./classification_results/${model_name}/metrics_${task_type}_${current_time}.json" \
-  --save_individual_results_path "./classification_results/${model_name}/all_${task_type}_${current_time}.json" \
-  --override_model_path $model_path
+  --save_individual_results_path "./classification_results/${model_name}/all_${task_type}_${current_time}.json"
